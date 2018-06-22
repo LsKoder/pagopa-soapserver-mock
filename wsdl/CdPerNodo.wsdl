@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions 
+	xmlns:ppt="http://ws.pagamenti.telematici.gov/" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+>
+	<wsdl:types>
+		<xsd:schema 
+			version="2.1" 
+			targetNamespace="http://ws.pagamenti.telematici.gov/">
+		</xsd:schema>
+	</wsdl:types>
+	
+	<!-- definition of the data being communicated... -->
+	<wsdl:message name="cdInfoPagamento">
+		<wsdl:part name="bodyRequest" element="ppt:cdInfoPagamento" />
+	</wsdl:message>
+	<wsdl:message name="cdInfoPagamentoResponse">
+		<wsdl:part name="bodyResponse" element="ppt:cdInfoPagamentoResponse" />
+	</wsdl:message>
+
+	<!-- set of operations... -->
+	<wsdl:portType name="CdPort">
+		<wsdl:operation name="cdInfoPagamento">
+			<wsdl:input message="tns:cdInfoPagamento"></wsdl:input>
+			<wsdl:output message="tns:cdInfoPagamentoResponse"></wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	
+	<!-- protocol and data format specification... -->
+	<wsdl:binding name="CdBinding" type="tns:CdPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="cdInfoPagamento">
+			<soap:operation soapAction="cdInfoPagamento" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	
+	<!-- definition of a service...-->
+	<wsdl:service name="CdService">
+		<wsdl:port name="CdPort" binding="tns:CdBinding">
+			<soap:address location="http://ciaoooo.it/" />
+		</wsdl:port>
+	</wsdl:service>
+	
+</wsdl:definitions>

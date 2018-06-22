@@ -1,0 +1,17 @@
+{
+  "name": "pagopa-server-mock",
+  "version": "0.0.1",
+  "description": "PagoPA SOAP Server Mocked",
+  "main": "index.js",
+  "author": "Manetta Sergio <manettasergio@gmail.com>",
+  "license": "MIT",
+  "scripts" :  {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "soap": "^0.24.0",
+    "express": "^4.16.3",
+    "fs": "^0.0.2",
+    "body-parser": "^1.18.3"
+  }
+}
