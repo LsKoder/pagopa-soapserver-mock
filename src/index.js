@@ -2,8 +2,11 @@ var soap = require('soap');
 var express = require('express');
 var fs = require('fs');
 var bodyParser = require('body-parser')
+const uuidv1 = require('uuid/v1');
 
 // SOAP WS Configuration
+const PROXY_SERVER_PORT = 3000;
+const PROXY_ENDPOINT = "/FespCdService";
 const SERVER_PORT = 3001;
 const NODO_WSDL = "./wsdl/NodoPerPsp.wsdl";
 const NODO_ENDPOINT = "/PagamentiTelematiciPspNodoservice";
@@ -48,7 +51,11 @@ async function startMockServer() {
               input.codiceIdRPT.AuxDigit === "0" &&
               input.codiceIdRPT.CodIUV === "1234567890123"
             ){
-              return nodoAttivaRPTRispostaOK;
+              // Provide an async response with PaymentId, after a random number of secs
+              const asyncResponseDelay = Math.floor(Math.random() * 10)+5; // 5-14 secs
+              const paymentId = uuidv1();
+              setTimeout(sendPaymentIdToPagoPaProxy, asyncResponseDelay*1000, input.codiceContestoPagamento, paymentId);
+              return nodoAttivaRPTRispostaOK; // Return a sync feedback
             }
             return nodoAttivaRPTRispostaKO;
           })();
@@ -71,6 +78,24 @@ console.log("Starting PagoPA Mock Server...");
 startMockServer().then(
   console.log(`Server started at http://localhost:${SERVER_PORT} `)
 )
+
+// Send a random paymentId to Proxy PagoPA
+function sendPaymentIdToPagoPaProxy(codiceContestoPagamento, paymentId){
+  var url = `http://localhost:${PROXY_SERVER_PORT}${PROXY_ENDPOINT}?wsdl`;
+  var message = {
+    identificativoDominio: "TEST",
+    identificativoUnivocoVersamento: "TEST",
+    codiceContestoPagamento,
+    idPagamento: paymentId
+  };
+  soap.createClient(url, function(err, client) {
+      client.cdInfoPagamento(
+        message, function(err, result) {
+          console.log(`Message sent. Response: ${result}`);
+      });
+  });
+}
+
 
 // Log SOAP request and response
 function logSoapMessages(input, output){

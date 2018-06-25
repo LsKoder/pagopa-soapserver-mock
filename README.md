@@ -32,3 +32,6 @@ http://localhost:3001/PagamentiTelematiciPspNodoservice?wsdl
   }
 }
 ```
+
+After a successfully "AttivaRPT Request" (esito: OK), an async cdInfoPagamento request will be sent to http://localhost:3001/FespCdService?wsdl (random delay set to 5-14 seconds).
+It contains a random paymentId and the codiceContestoPagamento provided into the request
