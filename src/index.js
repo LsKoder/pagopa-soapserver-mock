@@ -14,6 +14,8 @@ const NODO_ENDPOINT = "/PagamentiTelematiciPspNodoservice";
 // MockedData
 const nodoVerificaRPTRispostaOK = require("./mockedData").nodoVerificaRPTRispostaOK
 const nodoAttivaRPTRispostaOK = require("./mockedData").nodoAttivaRPTRispostaOK
+const nodoVerificaRPTRispostaKO = require("./mockedData").nodoVerificaRPTRispostaKO
+const nodoAttivaRPTRispostaKO = require("./mockedData").nodoAttivaRPTRispostaKO
 
 async function startMockServer() {
 
@@ -45,7 +47,7 @@ async function startMockServer() {
         ) => {
           const output = (() => {
             if (
-              input.datiPagamentoPSP.importoSingoloVersamento === 100.52 &&
+              input.datiPagamentoPSP.importoSingoloVersamento === String(100.52) &&
               input.codiceIdRPT.CF === "12345678901" &&
               input.codiceIdRPT.CodStazPA === "12" &&
               input.codiceIdRPT.AuxDigit === "0" &&
@@ -59,8 +61,8 @@ async function startMockServer() {
             }
             return nodoAttivaRPTRispostaKO;
           })();
-          logSoapMessages(input, nodoAttivaRPTRispostaOK);
-          callback(nodoAttivaRPTRispostaOK);
+          logSoapMessages(input, output);
+          callback(output);
         }
       }
     }
@@ -89,10 +91,15 @@ function sendPaymentIdToPagoPaProxy(codiceContestoPagamento, paymentId){
     idPagamento: paymentId
   };
   soap.createClient(url, function(err, client) {
-      client.cdInfoPagamento(
-        message, function(err, result) {
-          console.log(`Message sent. Response: ${result}`);
-      });
+    if (err!==undefined){
+      logSoapMessages(message, err);
+      return;
+    }
+    client.cdInfoPagamento(
+      message, function(err, response) {
+        logSoapMessages(message, response);
+      }
+    );
   });
 }
 
