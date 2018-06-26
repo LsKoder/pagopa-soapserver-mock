@@ -55,7 +55,7 @@ async function startMockServer() {
             ){
               // Provide an async response with PaymentId, after a random number of secs
               const asyncResponseDelay = Math.floor(Math.random() * 10)+5; // 5-14 secs
-              const paymentId = uuidv1();
+              const paymentId = uuidv1().replace(new RegExp("-", "g"), "");
               setTimeout(sendPaymentIdToPagoPaProxy, asyncResponseDelay*1000, input.codiceContestoPagamento, paymentId);
               return nodoAttivaRPTRispostaOK; // Return a sync feedback
             }
@@ -85,18 +85,26 @@ startMockServer().then(
 function sendPaymentIdToPagoPaProxy(codiceContestoPagamento, paymentId){
   var url = `http://localhost:${PROXY_SERVER_PORT}${PROXY_ENDPOINT}?wsdl`;
   var message = {
-    identificativoDominio: "TEST",
-    identificativoUnivocoVersamento: "TEST",
-    codiceContestoPagamento,
-    idPagamento: paymentId
+      identificativoDominio: "TEST",
+      identificativoUnivocoVersamento: "TEST",
+      codiceContestoPagamento,
+      idPagamento: paymentId
   };
-  soap.createClient(url, function(err, client) {
-    if (err!==undefined){
-      logSoapMessages(message, err);
+  soap.createClient(url, 
+    {
+      endpoint: url
+    },
+    function(err, client) {
+    if (err!==undefined && err!==null){
+      logSoapMessages(message, "CONNECTION ERROR: "+err);
       return;
     }
     client.cdInfoPagamento(
       message, function(err, response) {
+        if (err!==undefined && err!==null){
+          logSoapMessages(message, "CLIENT ERROR: "+err);
+          return;
+        }
         logSoapMessages(message, response);
       }
     );

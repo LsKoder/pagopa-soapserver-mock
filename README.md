@@ -8,14 +8,7 @@ http://localhost:3001/PagamentiTelematiciPspNodoservice?wsdl
 # Valid requests
 >VerificaRPT Request
 ```javascript
-{ 
-  codiceIdRPT: {
-    CF: "12345678901",
-    CodStazPA: "12",
-    AuxDigit: "0",
-    CodIUV: "1234567890123"
-  }
-}
+GET http://localhost:3000/payment-requests/12345678901012123456789012399
 ```
 
 >AttivaRPT Request
