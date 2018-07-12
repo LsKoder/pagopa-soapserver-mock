@@ -25,7 +25,9 @@ async function startMockServer() {
       PPTPort: {
         nodoVerificaRPT: (
           input,
-          callback
+          callback,
+          headers,
+          req
         ) => {
           const output = (() => {
             if (
@@ -43,7 +45,9 @@ async function startMockServer() {
         },
         nodoAttivaRPT: (
           input,
-          callback
+          callback,
+          headers,
+          req
         ) => {
           const output = (() => {
             if (
@@ -56,7 +60,7 @@ async function startMockServer() {
               // Provide an async response with PaymentId, after a random number of secs
               const asyncResponseDelay = Math.floor(Math.random() * 10)+5; // 5-14 secs
               const paymentId = uuidv1().replace(new RegExp("-", "g"), "");
-              setTimeout(sendPaymentIdToPagoPaProxy, asyncResponseDelay*1000, input.codiceContestoPagamento, paymentId);
+              setTimeout(sendPaymentIdToPagoPaProxy, asyncResponseDelay*1000, input.codiceContestoPagamento, paymentId, req.connection.remoteAddress.replace("::ffff:",""));
               return nodoAttivaRPTRispostaOK; // Return a sync feedback
             }
             return nodoAttivaRPTRispostaKO;
@@ -82,8 +86,8 @@ startMockServer().then(
 )
 
 // Send a random paymentId to Proxy PagoPA
-function sendPaymentIdToPagoPaProxy(codiceContestoPagamento, paymentId){
-  var url = `http://localhost:${PROXY_SERVER_PORT}${PROXY_ENDPOINT}?wsdl`;
+function sendPaymentIdToPagoPaProxy(codiceContestoPagamento, paymentId, remoteAddress){
+  var url = `http://${remoteAddress}:${PROXY_SERVER_PORT}${PROXY_ENDPOINT}?wsdl`;
   var message = {
       identificativoDominio: "TEST",
       identificativoUnivocoVersamento: "TEST",
