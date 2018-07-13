@@ -5,9 +5,9 @@ var bodyParser = require('body-parser')
 const uuidv1 = require('uuid/v1');
 
 // SOAP WS Configuration
-const PROXY_SERVER_PORT = 3000;
+const PROXY_SERVER_PORT = 443;
 const PROXY_ENDPOINT = "/FespCdService";
-const SERVER_PORT = 3001;
+const SERVER_PORT = process.env.PORT || 3000;
 const NODO_WSDL = "./wsdl/NodoPerPsp.wsdl";
 const NODO_ENDPOINT = "/PagamentiTelematiciPspNodoservice";
 
@@ -77,13 +77,12 @@ async function startMockServer() {
   var app = express();
   app.use(bodyParser.raw({type: function(){return true;}, limit: '5mb'}));
   app.listen(SERVER_PORT, function(){
-      soap.listen(app, NODO_ENDPOINT, servicesHandler, nodoWsdl);      
+      soap.listen(app, NODO_ENDPOINT, servicesHandler, nodoWsdl);
+      console.log(`Server started at http://localhost:${SERVER_PORT} `)  
   });
 }
 console.log("Starting PagoPA Mock Server...");
-startMockServer().then(
-  console.log(`Server started at http://localhost:${SERVER_PORT} `)
-)
+startMockServer();
 
 // Send a random paymentId to Proxy PagoPA
 function sendPaymentIdToPagoPaProxy(codiceContestoPagamento, paymentId, remoteAddress){
