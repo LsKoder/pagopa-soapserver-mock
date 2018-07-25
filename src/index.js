@@ -7,7 +7,7 @@ const uuidv1 = require('uuid/v1');
 // SOAP WS Configuration
 const BLUEMIX_SERVER_NAME = "pagopaproxyserver.eu-de.mybluemix.net";
 const PROXY_ENDPOINT = "/FespCdService";
-const SERVER_PORT = number(process.env.PORT) || 3001;
+const SERVER_PORT = Number(process.env.PORT) || 3001;
 const NODO_WSDL = "./wsdl/NodoPerPsp.wsdl";
 const NODO_ENDPOINT = "/PagamentiTelematiciPspNodoservice";
 
