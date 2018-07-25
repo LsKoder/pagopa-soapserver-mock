@@ -30,9 +30,10 @@ module.exports = {
   nodoVerificaRPTRispostaKO : {
     nodoVerificaRPTRisposta: {
       fault: {
-        faultCode: "01",
-        faultString: "Fault Error String Example",
-        id: "ID_EXAMPLE",
+        id: "NodoDeiPagamentiSPC",
+        faultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO",
+        faultString:
+          "L’importo del pagamento in attesa non è congruente con il dato indicato dal PSP"
       },
       esito: "KO"
     }
@@ -69,9 +70,22 @@ module.exports = {
   nodoAttivaRPTRispostaKO : {
     nodoAttivaRPTRisposta : {
       fault: {
-        faultCode: "01",
-        faultString: "Fault Error String Example",
-        id: "ID_EXAMPLE",
+        id: "NodoDeiPagamentiSPC",
+        faultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO",
+        faultString:
+          "L’importo del pagamento in attesa non è congruente con il dato indicato dal PSP"
+      },
+      esito: "KO"
+    }
+  },
+
+  nodoAttivaRPTRispostaKOImporto : {
+    nodoAttivaRPTRisposta : {
+      fault: {
+        id: "NodoDeiPagamentiSPC",
+        faultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO",
+        faultString:
+          "L’importo del pagamento in attesa non è congruente con il dato indicato dal PSP"
       },
       esito: "KO"
     }

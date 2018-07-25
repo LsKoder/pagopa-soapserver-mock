@@ -16,6 +16,7 @@ const nodoVerificaRPTRispostaOK = require("./mockedData").nodoVerificaRPTRispost
 const nodoAttivaRPTRispostaOK = require("./mockedData").nodoAttivaRPTRispostaOK
 const nodoVerificaRPTRispostaKO = require("./mockedData").nodoVerificaRPTRispostaKO
 const nodoAttivaRPTRispostaKO = require("./mockedData").nodoAttivaRPTRispostaKO
+const nodoAttivaRPTRispostaKOImporto = require("./mockedData").nodoAttivaRPTRispostaKOImporto
 
 async function startMockServer() {
 
@@ -50,20 +51,27 @@ async function startMockServer() {
           req
         ) => {
           const output = (() => {
+            // Case 1-2: RptId exists
             if (
-              input.datiPagamentoPSP.importoSingoloVersamento === String(100.52) &&
               input.codiceIdRPT.CF === "12345678901" &&
               input.codiceIdRPT.CodStazPA === "12" &&
               input.codiceIdRPT.AuxDigit === "0" &&
               input.codiceIdRPT.CodIUV === "1234567890123"
             ){
-              // Provide an async response with PaymentId, after a random number of secs
+              // Case 2: Amount is wrong
+              if (input.datiPagamentoPSP.importoSingoloVersamento !== String(100.52)){
+                return nodoAttivaRPTRispostaKOImporto;
+              }
+
+              // Case 1: Provide an async response with PaymentId, after a random number of secs
               const asyncResponseDelay = Math.floor(Math.random() * 3)+2; // 2-5 secs
               const paymentId = uuidv1().replace(new RegExp("-", "g"), "");
               const remoteAddress = input.identificativoPSP === "bluemix" ? BLUEMIX_SERVER_NAME : req.connection.remoteAddress.replace("::ffff:","");
               setTimeout(sendPaymentIdToPagoPaProxy, asyncResponseDelay*1000, input.codiceContestoPagamento, paymentId, remoteAddress);
               return nodoAttivaRPTRispostaOK; // Return a sync feedback
             }
+
+            // Case 3: Invalid RPT or generic error
             return nodoAttivaRPTRispostaKO;
           })();
           logSoapMessages(input, output);
