@@ -5,15 +5,9 @@ var bodyParser = require('body-parser')
 const uuidv1 = require('uuid/v1');
 
 // SOAP WS Configuration
-<<<<<<< HEAD
-const PROXY_SERVER_PORT = 3000;
-const PROXY_ENDPOINT = "/FespCdService";
-const SERVER_PORT = Number(process.env.PORT) || 3001;
-=======
 const BLUEMIX_SERVER_NAME = "pagopaproxyserver.eu-de.mybluemix.net";
 const PROXY_ENDPOINT = "/FespCdService";
 const SERVER_PORT = number(process.env.PORT) || 3001;
->>>>>>> 77e70fec646716ea1fbd5b958ffdd3dfd46ab414
 const NODO_WSDL = "./wsdl/NodoPerPsp.wsdl";
 const NODO_ENDPOINT = "/PagamentiTelematiciPspNodoservice";
 
