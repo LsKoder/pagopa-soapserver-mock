@@ -5,9 +5,9 @@ var bodyParser = require('body-parser')
 const uuidv1 = require('uuid/v1');
 
 // SOAP WS Configuration
-const PROXY_SERVER_PORT = 443;
+const PROXY_SERVER_PORT = 3000;
 const PROXY_ENDPOINT = "/FespCdService";
-const SERVER_PORT = process.env.PORT || 3000;
+const SERVER_PORT = Number(process.env.PORT) || 3001;
 const NODO_WSDL = "./wsdl/NodoPerPsp.wsdl";
 const NODO_ENDPOINT = "/PagamentiTelematiciPspNodoservice";
 
