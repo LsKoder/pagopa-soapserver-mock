@@ -5,9 +5,9 @@ var bodyParser = require('body-parser')
 const uuidv1 = require('uuid/v1');
 
 // SOAP WS Configuration
-const PROXY_SERVER_PORT = 3000;
+const BLUEMIX_SERVER_NAME = "pagopaproxyserver.eu-de.mybluemix.net";
 const PROXY_ENDPOINT = "/FespCdService";
-const SERVER_PORT = 3001;
+const SERVER_PORT = number(process.env.PORT) || 3001;
 const NODO_WSDL = "./wsdl/NodoPerPsp.wsdl";
 const NODO_ENDPOINT = "/PagamentiTelematiciPspNodoservice";
 
@@ -58,9 +58,10 @@ async function startMockServer() {
               input.codiceIdRPT.CodIUV === "1234567890123"
             ){
               // Provide an async response with PaymentId, after a random number of secs
-              const asyncResponseDelay = Math.floor(Math.random() * 10)+5; // 5-14 secs
+              const asyncResponseDelay = Math.floor(Math.random() * 3)+2; // 2-5 secs
               const paymentId = uuidv1().replace(new RegExp("-", "g"), "");
-              setTimeout(sendPaymentIdToPagoPaProxy, asyncResponseDelay*1000, input.codiceContestoPagamento, paymentId, req.connection.remoteAddress.replace("::ffff:",""));
+              const remoteAddress = input.identificativoPSP === "bluemix" ? BLUEMIX_SERVER_NAME : req.connection.remoteAddress.replace("::ffff:","");
+              setTimeout(sendPaymentIdToPagoPaProxy, asyncResponseDelay*1000, input.codiceContestoPagamento, paymentId, remoteAddress);
               return nodoAttivaRPTRispostaOK; // Return a sync feedback
             }
             return nodoAttivaRPTRispostaKO;
@@ -77,23 +78,24 @@ async function startMockServer() {
   var app = express();
   app.use(bodyParser.raw({type: function(){return true;}, limit: '5mb'}));
   app.listen(SERVER_PORT, function(){
-      soap.listen(app, NODO_ENDPOINT, servicesHandler, nodoWsdl);      
+      soap.listen(app, NODO_ENDPOINT, servicesHandler, nodoWsdl);
+      console.log(`Server started at http://localhost:${SERVER_PORT} `)  
   });
 }
 console.log("Starting PagoPA Mock Server...");
-startMockServer().then(
-  console.log(`Server started at http://localhost:${SERVER_PORT} `)
-)
+startMockServer();
 
 // Send a random paymentId to Proxy PagoPA
 function sendPaymentIdToPagoPaProxy(codiceContestoPagamento, paymentId, remoteAddress){
-  var url = `http://${remoteAddress}:${PROXY_SERVER_PORT}${PROXY_ENDPOINT}?wsdl`;
+
+  var url = `http://${remoteAddress}${PROXY_ENDPOINT}?wsdl`;
   var message = {
       identificativoDominio: "TEST",
       identificativoUnivocoVersamento: "TEST",
       codiceContestoPagamento,
       idPagamento: paymentId
   };
+  console.log("Sending async message to "+url+"...");
   soap.createClient(url, 
     {
       endpoint: url
